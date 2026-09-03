@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agentic Alpha Research"
+  short_description: "Evolve and audit local alpha-factor research workflows"
+  default_prompt: "Use $agentic-alpha-research to evolve one local factor through evidence-based research rounds."

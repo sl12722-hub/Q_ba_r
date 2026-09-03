@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "candidate_version": "V6.0-candidate.1",
+  "parent_version": "V5.9.0",
+  "status": "promoted",
+  "change_class": "major",
+  "hypothesis": "A causal rank-innovation router plus an exact research-policy capacity anchor will turn shared fold failure into a reproducible new mechanism while preventing diagnostic quality from being confused with executable survival.",
+  "promotion_requirements": [
+    "pure innovation and hybrid representation controls are evaluated",
+    "at least one adjacent hybrid lag pair passes the complete quality gate",
+    "OOF and tail-alignment audits pass for the selected diagnostic survivor",
+    "the exact daily research-policy anchor is audited across all capitals",
+    "capacity near-misses remain rejected",
+    "project and Skill validation pass"
+  ],
+  "benchmark_evidence": {
+    "skill_tests": "16 passed",
+    "project_tests": "70 passed",
+    "quick_validation": "passed",
+    "pure_innovation_control": "worst-fold repaired to -0.007971; rejected on IC 0.008211",
+    "hybrid_lag_quality_survivors": 3,
+    "adjacent_passing_pairs": 2,
+    "selected_diagnostic_lag": 10,
+    "selected_diagnostic_net_sharpe": 3.147143545143573,
+    "selected_diagnostic_total_return": 3.7376059305861915,
+    "selected_diagnostic_worst_fold_ic": -0.00336128543743213,
+    "oof_audit": "passed",
+    "tail_alignment": "proceed_capacity",
+    "stress_grid_accepted_policies": 0,
+    "research_anchor_complete": true,
+    "research_anchor_all_capitals_pass": false,
+    "research_anchor_fill_range": [0.8924370753792217, 0.8924814311756112],
+    "anchor_audit_replay_sha256": "f981f4eb1b18c97154afabb78ac19eca42cc0f3becca5e498e66b55a73c864a3"
+  },
+  "promotion_decision": "promoted as V6.0.0; no factor promoted"
+}
