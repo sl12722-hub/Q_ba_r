@@ -38,14 +38,15 @@ agentic-alpha-research/
 
 ## 安装
 
-将整个仓库复制到：
+将本发布包目录中的内容复制到：
 
 ```text
 %USERPROFILE%\.codex\skills\agentic-alpha-research
 ```
 
-目录名应保持为 `agentic-alpha-research`。重新加载 Codex 后，可以自动触发
-该 Skill，也可以显式使用 `$agentic-alpha-research`。
+安装后的目录名应保持为 `agentic-alpha-research`，且 `SKILL.md` 应位于该目录
+顶层。重新加载 Codex 后，可以自动触发该 Skill，也可以显式使用
+`$agentic-alpha-research`。
 
 ## 接入本地研究项目
 

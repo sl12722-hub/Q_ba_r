@@ -38,15 +38,16 @@ agentic-alpha-research/
 
 ## Install as a Codex Skill
 
-Copy the repository folder to:
+Copy the contents of this release package to:
 
 ```text
 %USERPROFILE%\.codex\skills\agentic-alpha-research
 ```
 
-Keep the folder name `agentic-alpha-research`. Restart or reload Codex after
-installation. The skill remains eligible for automatic invocation and can also
-be invoked explicitly as `$agentic-alpha-research`.
+Keep the installed folder name `agentic-alpha-research`, with `SKILL.md` at its
+top level. Restart or reload Codex after installation. The skill remains
+eligible for automatic invocation and can also be invoked explicitly as
+`$agentic-alpha-research`.
 
 ## Connect a Research Project
 

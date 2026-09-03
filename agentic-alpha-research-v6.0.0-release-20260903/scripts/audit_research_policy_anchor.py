@@ -74,7 +74,11 @@ def audit_anchor(
         "anchor_complete": complete,
         "all_capitals_pass": all_capitals_pass,
         "metrics": metrics,
-        "decision": "capacity_anchor_passed" if all_capitals_pass else "reject_executable_promotion",
+        "decision": (
+            "capacity_anchor_passed"
+            if all_capitals_pass
+            else "reject_executable_promotion"
+        ),
     }
 
 
@@ -103,7 +107,7 @@ def main() -> int:
     if args.output_json:
         Path(args.output_json).write_text(rendered, encoding="utf-8")
     print(rendered, end="")
-    return 0 if result["anchor_complete"] else 2
+    return 0 if result["all_capitals_pass"] else 2
 
 
 if __name__ == "__main__":

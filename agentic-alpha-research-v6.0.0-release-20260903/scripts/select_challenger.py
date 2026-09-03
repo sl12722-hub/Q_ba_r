@@ -21,7 +21,7 @@ def parse_args() -> argparse.Namespace:
         "--values",
         nargs="+",
         required=True,
-        help="Ordered axis values representing V1, V2, ...",
+        help="Ordered axis values representing T001, T002, ...",
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--factor-id", required=True)
@@ -121,7 +121,7 @@ def main() -> int:
         ]
         record = {
             "generation": index,
-            "label": f"V{index}",
+            "label": f"T{index:03d}",
             "axis": args.axis,
             "axis_value": number(requested_value),
         }

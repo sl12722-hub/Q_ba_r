@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import csv
 import importlib.util
+import json
 from pathlib import Path
+import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 
 
 SCRIPT = Path(__file__).parents[1] / "scripts" / "audit_research_policy_anchor.py"
@@ -34,6 +39,13 @@ def row(capital: float, accepted: bool) -> dict[str, str]:
     }
 
 
+def write_capacity_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 class ResearchPolicyAnchorTests(unittest.TestCase):
     def test_complete_passing_anchor_passes(self) -> None:
         result = MODULE.audit_anchor(
@@ -62,6 +74,37 @@ class ResearchPolicyAnchorTests(unittest.TestCase):
         )
         self.assertFalse(result["anchor_complete"])
         self.assertEqual(result["missing_capitals"], [1000000])
+
+    def test_cli_returns_failure_for_complete_rejected_anchor(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            research_path = root / "research.json"
+            capacity_path = root / "capacity.csv"
+            output_path = root / "anchor.json"
+            research_path.write_text(json.dumps(RESEARCH), encoding="utf-8")
+            write_capacity_csv(
+                capacity_path,
+                [row(100000, True), row(500000, False), row(1000000, True)],
+            )
+
+            argv = [
+                "audit_research_policy_anchor.py",
+                "--research-report",
+                str(research_path),
+                "--capacity-csv",
+                str(capacity_path),
+                "--expected-capitals",
+                "100000",
+                "500000",
+                "1000000",
+                "--output-json",
+                str(output_path),
+            ]
+            with patch.object(sys, "argv", argv):
+                self.assertEqual(MODULE.main(), 2)
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+            self.assertTrue(payload["anchor_complete"])
+            self.assertFalse(payload["all_capitals_pass"])
 
 
 if __name__ == "__main__":

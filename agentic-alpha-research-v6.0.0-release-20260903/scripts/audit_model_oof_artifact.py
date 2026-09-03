@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 
 
 def _sha256(path: Path) -> str:
@@ -31,11 +32,41 @@ def main() -> int:
         raise ValueError(f"missing OOF artifact: {oof_path}")
 
     required = {"date", "instrument", "factor", "target", "fold_id"}
-    frame = pd.read_parquet(oof_path, columns=sorted(required))
-    missing = sorted(required - set(frame.columns))
+    parquet_file = pq.ParquetFile(oof_path)
+    available_columns = set(parquet_file.schema_arrow.names)
+    missing = sorted(required - available_columns)
     if missing:
-        errors.append(f"missing columns: {missing}")
+        result = {
+            "schema_version": 1,
+            "status": "failed",
+            "research_report": str(report_path),
+            "oof_artifact": str(oof_path),
+            "oof_sha256": _sha256(oof_path),
+            "rows": None,
+            "unique_dates": None,
+            "first_date": None,
+            "last_date": None,
+            "fold_count": None,
+            "duplicate_key_count": None,
+            "overlapping_fold_date_count": None,
+            "holdout_2023_rows": None,
+            "nonfinite_factor_count": None,
+            "invalid_date_count": None,
+            "errors": [f"missing columns: {missing}"],
+        }
+        rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
+        if args.output:
+            output = Path(args.output)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(rendered, encoding="utf-8")
+        print(rendered, end="")
+        return 1
+
+    frame = pd.read_parquet(oof_path, columns=sorted(required))
     frame["date"] = pd.to_datetime(frame["date"], errors="coerce").dt.normalize()
+    invalid_date_count = int(frame["date"].isna().sum())
+    if invalid_date_count:
+        errors.append(f"invalid date values: {invalid_date_count}")
     expected_rows = int(report.get("oof_rows", -1))
     if expected_rows != len(frame):
         errors.append(f"OOF row mismatch: report={expected_rows}, artifact={len(frame)}")
@@ -56,6 +87,7 @@ def main() -> int:
     nonfinite_factors = int((~np.isfinite(pd.to_numeric(frame["factor"], errors="coerce"))).sum())
     if nonfinite_factors:
         errors.append(f"non-finite factor predictions: {nonfinite_factors}")
+    valid_dates = frame["date"].dropna()
 
     result = {
         "schema_version": 1,
@@ -65,13 +97,18 @@ def main() -> int:
         "oof_sha256": _sha256(oof_path),
         "rows": len(frame),
         "unique_dates": int(frame["date"].nunique()),
-        "first_date": frame["date"].min().date().isoformat(),
-        "last_date": frame["date"].max().date().isoformat(),
+        "first_date": (
+            valid_dates.min().date().isoformat() if not valid_dates.empty else None
+        ),
+        "last_date": (
+            valid_dates.max().date().isoformat() if not valid_dates.empty else None
+        ),
         "fold_count": actual_folds,
         "duplicate_key_count": duplicate_count,
         "overlapping_fold_date_count": overlapping_dates,
         "holdout_2023_rows": holdout_rows,
         "nonfinite_factor_count": nonfinite_factors,
+        "invalid_date_count": invalid_date_count,
         "errors": errors,
     }
     rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
